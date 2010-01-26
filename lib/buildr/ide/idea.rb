@@ -34,6 +34,11 @@ module Buildr
       project.recursive_task("idea")
     end
 
+    def self.info_missing_package(task)
+      info "Not generating '#{task.name}', it has no package specification."
+      info "Insert 'package :jar', if you want this file to be generated."
+    end
+
     after_define(:idea => :package) do |project|
       idea = project.task("idea")
       # We need paths relative to the top project's base directory.
@@ -51,7 +56,6 @@ module Buildr
 
       # The only thing we need to look for is a change in the Buildfile.
       file(task_name=>Buildr.application.buildfile) do |task|
-        info "Writing #{task.name}"
 
         # Idea handles modules slightly differently if they're WARs
         idea_types = Hash.new("JAVA_MODULE")
@@ -72,8 +76,11 @@ module Buildr
         # Generated: classpath elements in the project are assumed to be generated
         generated, libs = others.partition { |path| path.to_s.index(project.path_to.to_s) == 0 }
 
+
         # Project type is going to be the first package type
+        info_missing_package(task) unless project.packages.first
         if package = project.packages.first
+          info "Generating #{task.name}"
           File.open(task.name, "w") do |file|
             xml = Builder::XmlMarkup.new(:target=>file, :indent=>2)
 
@@ -121,7 +128,7 @@ module Buildr
 
                 # Libraries
                 ext_libs = libs.map {|path| "$MODULE_DIR$/#{path.to_s}" } +
-                    m2_libs.map { |path| path.to_s.sub(m2repo, "$M2_REPO$") }
+                        m2_libs.map { |path| path.to_s.sub(m2repo, "$M2_REPO$") }
                 ext_libs.each do |path|
                   xml.orderEntry :type=>"module-library" do
                     xml.library do
