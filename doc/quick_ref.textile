@@ -1,0 +1,38 @@
+
+h2. Startup Files
+
+The following files are read when Buildr is starting up.
+|_<. Files    		|_<. Name 					| _<. Used For |
+|Personal buildfile	|@$HOME/.buildr/buildr.rb@ 	|Personal tasks?|
+|Common buildfile	|@buildr.rb@               	|Helper methods and variables|
+|THE Buildfile		|@Buildfile@               	| The main projects and tasks|
+|Task files			| @tasks/\*.task@			| Reusable tasks|
+
+
+Setting can be specified in the following ways.
+|_<.Type of setting |_<. File |_<. Accessor method |
+|Personal  | @$HOME/.buildr/settings.yaml@ | @Buildr.settings.user@|
+|Build  |@build.yaml@ |@Buildr.settings.build@|
+|Profile |@profiles.yaml@|@Buildr.settings.profile@|
+
+
+h2. Environment Variables
+
+Environment variables can be specified like this, ordered by precedence:
+* In the startup buildfiles - @ENV['JAVA_OPTS'] ||= '-Xms1g -Xmx1g'@
+* On command line - @buildr test=no@
+* As an environment variable - @export HTTP_PROXY=http://myproxy:8080@
+
+|_<. Variable    |_<. Description |
+| @BUILDR_ENV@  | Environment (development, test,...). @-e@ command line option. |
+| @DEBUG@       | Set to @no/off@, compile without debugging  |
+| @HOME@        | Your home directory. |
+| @HTTP_PROXY@  | URL for HTTP proxy server for repositories. |
+| @HTTPS_PROXY@ | URL for HTTPS proxy server for repositories. |
+| @IGNORE_BUILDFILE@ | Set to @true/yes@ to ignore changes when running tests. |
+| @JAVA_HOME@   | Points to your JDK |
+| @JAVA_OPTS@   | Options to pass to the JDK (e.g. @'-Xms1g'@). |
+| @M2_REPO@     | Location of the Maven2 local repository. |
+| @NO_PROXY@    | Comma separated list of hoststhat should not be proxied  |
+| @TEST@        | Set to @no/off/all@ to tell Buildr to skip tests, or run all tests |
+| @USER@        | Tasks that need your user name will use this. |
