@@ -7,7 +7,7 @@ The following files are read when Buildr is starting up.
 |Common buildfile	|@buildr.rb@               	|Helper methods and variables|
 |THE Buildfile		|@Buildfile@               	| The main projects and tasks|
 |Task files			| @tasks/\*.task@			| Reusable tasks|
-
+		
 
 Setting can be specified in the following ways.
 |_<.Type of setting |_<. File |_<. Accessor method |
@@ -36,3 +36,48 @@ Environment variables can be specified like this, ordered by precedence:
 | @NO_PROXY@    | Comma separated list of hoststhat should not be proxied  |
 | @TEST@        | Set to @no/off/all@ to tell Buildr to skip tests, or run all tests |
 | @USER@        | Tasks that need your user name will use this. |
+
+h2. Tasks
+
+h3. Compile Task
+
+|from(\*sources) | Adds source directories to compile|
+|into(target_dir) | Sets the target directory |
+|using(options_hash) | Sets options for the compiler, the first argument may be the compiler itself (:scalac, :javac, :groovyc)|
+|with(\*artifacts)| Sets the dependencies for the compile task|
+
+h3. Resources Task
+
+|exclude(\*files)| Excludes files from copying|
+|from(\*source)| Adds source directories to be copied|
+|include(\*files)| Includes files in copying|
+|filter| Access the filter task attached to this Task| 
+
+h3. Filter Task
+
+|using(map_hash)| Name-value pairs to translate the keys in the code that is filtered, first argument may choose mapping style (:ant, :maven, :ruby, :erb , Rgexp)|
+
+h3. Archive Task, Zip Task, Tar Task, Package Gem Task, Jar Task
+
+|exclude(\*files)| Excludes files|
+|merge(\*archives)| Merges the archives into this archive|
+|include(\*files)| Includes files|
+|with(options_hash)| Sets options for the task| 
+
+h3. Test Task
+
+|exclude(\*tests)| Excludes files|
+|include(\*tests)| Includes files|
+|only_run(\tests)| Only run selected tests|
+|only_run_failed()| Only run tests that failed on the last run|
+|using(options_hash) | Sets options for the test framework, the first argument may be the test framework or type itself (:integration, :testng, :specs, etc)|
+|with(\*artifacts)| Sets the dependencies for the compile task|
+
+h3. Release Task, GitRelease, SvnRelease
+|make||
+
+h3. Artifact Task
+|download| Downloads the given artifact|
+|group(*names, :under=> package, :version=>ver)|Creates artifacts array|
+
+
