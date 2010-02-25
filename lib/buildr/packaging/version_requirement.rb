@@ -15,13 +15,13 @@
 
 
 module Buildr
-  
+
   #
   # See ArtifactNamespace#need
   class VersionRequirement
-    
+
     CMP_PROCS = Gem::Requirement::OPS.dup
-    CMP_REGEX = Gem::Requirement::OP_RE.dup
+    CMP_REGEX =  Gem::Requirement::OPS.keys.map { |k| Regexp.quote k }.join "|"
     CMP_CHARS = CMP_PROCS.keys.join
     BOOL_CHARS = '\|\&\!'
     VER_CHARS = '\w\.\-'
@@ -29,14 +29,14 @@ module Buildr
     class << self
       # is +str+ a version string?
       def version?(str)
-        /^\s*\d[#{VER_CHARS}]*\s*$/ === str
+        /^\s*[#{VER_CHARS}]+\s*$/ === str
       end
-      
+
       # is +str+ a version requirement?
       def requirement?(str)
         /[#{BOOL_CHARS}#{CMP_CHARS}\(\)]/ === str
       end
-      
+
       # :call-seq:
       #    VersionRequirement.create(" >1 <2 !(1.5) ") -> requirement
       #
@@ -53,7 +53,7 @@ module Buildr
           raise "Invalid requirement string: #{req}"
         end
         comparator, version = $1, $2
-        version = Gem::Version.new(0).tap { |v| v.version = version }
+        version = Gem::Version.new(version)
         VersionRequirement.new(nil, [$1, version])
       end
 
@@ -61,7 +61,7 @@ module Buildr
         vreq.negative = !vreq.negative
         vreq
       end
-      
+
       def normalize(str)
         str = str.strip
         if str[/[^\s\(\)#{BOOL_CHARS + VER_CHARS + CMP_CHARS}]/]
@@ -81,8 +81,10 @@ module Buildr
         str.gsub!(/!([^=])?/, ' negate \1')
         str.gsub!(pattern) do |expr|
           case expr.strip
-          when 'not', 'negate' then 'negate '
-          else 'requirement("' + expr + '")'
+            when 'not', 'negate' then
+              'negate '
+            else
+              'requirement("' + expr + '")'
           end
         end
         str.gsub!(/negate\s+\(/, 'negate(')
@@ -147,7 +149,7 @@ module Buildr
     def &(other)
       operation(:&, other)
     end
-    
+
     # return the parsed expression
     def to_s
       str = requirements.map(&:to_s).join(" " + @op.to_s + " ").to_s
@@ -159,8 +161,9 @@ module Buildr
     attr_accessor :negative
     protected
     attr_reader :requirements, :op
+
     def operation(op, other)
-      @op ||= op 
+      @op ||= op
       if negative == other.negative && @op == op && other.requirements.size == 1
         @requirements << other.requirements.first
         self
