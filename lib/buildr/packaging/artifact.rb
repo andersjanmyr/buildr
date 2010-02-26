@@ -315,6 +315,10 @@ module Buildr
       end
     end
 
+    def up_to_date_compared_to?(path)
+      File.exists?(path) ? test(?<, path, name) : File.exist?(name) 
+    end
+
     # :call-seq:
     #   from(path) => self
     #
@@ -324,16 +328,18 @@ module Buildr
     # See also Buildr#install and Buildr#upload.
     def from(path)
       path = File.expand_path(path.to_s)
-      enhance [path] do
-        mkpath File.dirname(name)
-        pom.invoke unless type == :pom
-        cp path, name
-        info "Installed #{path} as #{to_spec}"
-      end
-      unless type == :pom
-        pom.enhance do
-          mkpath File.dirname(pom.name)
-          File.open(pom.name, 'w') { |file| file.write pom.pom_xml }
+      unless up_to_date_compared_to?(path)
+        enhance [path] do
+          mkpath File.dirname(name)
+          pom.invoke unless type == :pom
+          cp path, name
+          info "Installed #{path} as #{to_spec}"
+        end
+        unless type == :pom
+          pom.enhance do
+            mkpath File.dirname(pom.name)
+            File.open(pom.name, 'w') { |file| file.write pom.pom_xml }
+          end
         end
       end
       self
