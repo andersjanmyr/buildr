@@ -429,23 +429,6 @@ describe Buildr, '#artifact' do
     lambda { artifact.invoke }.should change { File.exist?(artifact.to_s) }.to(true)
   end
 
-
-  it 'should trigger from dependency if not installed' do
-    file = 'test.jar'
-    touch file
-    artifact = artifact('group:id:jar:1.0').from(file)
-    lambda { artifact.invoke }.should change { artifact.up_to_date_compared_to?(file) }.to(true)
-  end
-
-  it 'should not trigger from dependency if installed' do
-    file = 'test.jar'
-    touch file
-    artifact = artifact('group:id:jar:1.0').from(file)
-    lambda { artifact.invoke }.should change { artifact.up_to_date_compared_to?(file) }.to(true)
-    lambda { artifact.invoke }.should_not change { artifact.up_to_date_compared_to?(file) }.to(true)
-  end
-
-
   it 'should reference artifacts defined on build.yaml by using ruby symbols' do
     write 'build.yaml', <<-YAML
       artifacts: 
